@@ -90,6 +90,11 @@ const UNDEFINED_TARGET_FLOOR int = -1
 const INVALID_FLOOR int = -1
 const MAX_FLOOR_NUMBER int = 4
 
+var isInitialized bool = false
+var isOrderServed bool = false
+var state int
+var previousState int
+
 var ClientTable []NetworkNode
 var masterId string
 var backupId string
