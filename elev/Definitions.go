@@ -1,5 +1,9 @@
 package elev
 
+import (
+  "./Network"
+)
+
 type MessageEvent int
 type ActionCommand int
 type MotorDirection int
@@ -102,6 +106,16 @@ const (
 	STATUS_OCCUPIED  int = 1
 )
 
+MotorChannel := make(chan MotorDirection)
+LightChannel := make(chan Light)
+DoorChannel := make(chan bool)
+FloorChannel := make(chan int)
+ButtonChannel := make(chan elevio.ButtonEvent)
+RequestChannel := make(chan Action)
+SendOrderChannel := make(chan ElevatorOrderMessage)
+ReceiveOrderChannel := make(chan ElevatorOrderMessage)
+
+
 const UNDEFINED int = -1
 const UNDEFINED_TARGET_FLOOR int = -1
 const INVALID_FLOOR int = -1
@@ -133,6 +147,7 @@ var LastFloor int
 var TargetFloor int
 // IsIntermediateStop kan tas ut av systemet
 var IsIntermediateStop bool
+
 var ElevatorDirection MotorDirection
 
 // Skal dette være i definitions?
