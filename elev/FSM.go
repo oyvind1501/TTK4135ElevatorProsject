@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Skal dette være her. Kan legges et annet sted
 var isInitialized bool = false
 var isOrderServed bool = false
 var state int
