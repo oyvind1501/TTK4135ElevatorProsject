@@ -32,7 +32,6 @@ const (
 	FLOOR_UP   int = 3
 	DOWN       int = 4
 	FLOOR_DOWN int = 5
-	//STOP       int = 6
 )
 
 const (
@@ -40,7 +39,6 @@ const (
 	DIR_DOWN MotorDirection = -1
 	DIR_STOP MotorDirection = 0
 )
-
 
 const (
 	BUTTON_HALL_UP   int = 0
@@ -74,10 +72,7 @@ const (
 )
 
 const UNDEFINED int = -1
-
 const UNDEFINED_TARGET_FLOOR int = -1
-
-
 const INVALID_FLOOR int = -1
 const MAX_FLOOR_NUMBER int = 4
 
