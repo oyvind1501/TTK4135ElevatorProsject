@@ -41,12 +41,6 @@ const (
 	DIR_STOP MotorDirection = 0
 )
 
-/*
-const (
-	DOOR_CLOSED int = 0
-	DOOR_OPEN   int = 1
-)
-*/
 
 const (
 	BUTTON_HALL_UP   int = 0
@@ -83,32 +77,23 @@ const UNDEFINED int = -1
 
 const UNDEFINED_TARGET_FLOOR int = -1
 
-//const UNDEFINED_NOT_AVAILABLE int = -2
+
 const INVALID_FLOOR int = -1
 const MAX_FLOOR_NUMBER int = 4
 
-const (
-//CloseDoor bool = false
-//OpenDoor bool = false
-)
 
 var open bool
 var doorOpenedAtFloor bool
-
 var doorOpened bool = false
 var openDoorAtFloor int = UNDEFINED
-
 var hallTarget int = UNDEFINED
 var lastHallTarget int = UNDEFINED
-
 var LastFloor int
 var TargetFloor int
-
 var IsIntermediateStop bool
 var ElevatorDirection MotorDirection
 
-//var LastDirection MotorDirection
-
+// Skal dette være i definitions?
 func ReadFloorSensor(floorChannel chan int) int {
 	select {
 	case floor := <-floorChannel:
@@ -123,8 +108,3 @@ func UpdateFloorIndicator(floorNumber int, prevFloorNumber int, lightChannel cha
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: true, FloorNumber: floorNumber}
 }
 
-/*
-func UpdateIndicator(indicator int, lightActive bool, floorNumber int, lightChannel chan Light) {
-	lightChannel <- Light{LightType: indicator, LightOn: lightActive, FloorNumber: floorNumber}
-}
-*/
