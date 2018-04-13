@@ -4,12 +4,6 @@ import (
 	"time"
 )
 
-// Skal dette være her. Kan legges et annet sted
-var isInitialized bool = false
-var isOrderServed bool = false
-var state int
-var previousState int
-
 func initState(motorChannel chan MotorDirection, floorChannel chan int, requestChannel chan Action) {
 	if isInitialized {
 		state = IDLE
