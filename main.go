@@ -1,8 +1,6 @@
 package main
 
 import (
-	//"time"
-
 	"./elev"
 	"./elev/driver/elevio"
 )
