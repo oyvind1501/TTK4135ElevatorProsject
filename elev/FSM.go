@@ -18,7 +18,6 @@ func initState(motorChannel chan MotorDirection, floorChannel chan int, requestC
 		Command: ACTION_RESET_ALL_LIGHTS,
 		Floor:   LastFloor,
 	}
-
 	var elevatorIsApproaching bool = false
 	for {
 		floor := ReadFloorSensor(floorChannel)
