@@ -5,7 +5,7 @@ import "fmt"
 
 
 
-func PrintHallTable() {
+func printHallTable() {
 	fmt.Println("-----------------Hall Order Table:----------------------")
 	if len(HallOrderTable) == 0 {
 		fmt.Println("	No hall")
@@ -33,7 +33,7 @@ func PrintHallTable() {
 	fmt.Println("--------------------------------------------------------")
 }
 
-func PrintCabTable() {
+func printCabTable() {
 	fmt.Println("-----------------Cab Order Table------------------------")
 	if len(CabOrderTable) == 0 {
 		fmt.Println("	No cab")
@@ -45,7 +45,7 @@ func PrintCabTable() {
 	fmt.Println("--------------------------------------------------------")
 }
 
-func PrintCommunicationTable() {
+func printCommunicationTable() {
 	var nodeType string
 	var nodeTypeId string
 
@@ -69,7 +69,7 @@ func PrintCommunicationTable() {
 	fmt.Println("--------------------------------------------------------")
 }
 
-func PrintStateInfo() {
+func printStateInfo() {
 	fmt.Println("-----------------Elevator Info--------------------------")
 	fmt.Println("	Target floor:\t\t" + strconv.Itoa(TargetFloor))
 	fmt.Println("	Last floor: \t\t" + strconv.Itoa(LastFloor))
