@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	// Disse kan legges et annet sted slik at vi kun har go routines her
 	elevio.Init("localhost:15657", 4)
 	elev.TargetFloor = elev.UNDEFINED_TARGET_FLOOR
 	motorChannel := make(chan elev.MotorDirection)
