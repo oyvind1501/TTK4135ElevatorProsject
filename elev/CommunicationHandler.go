@@ -100,13 +100,6 @@ func OrderReserveEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOr
 	}
 }
 
-
-
-
-
-
-
-
 func AckOrderReserveEvent(message ElevatorOrderMessage) {
 	if message.Origin == nodeId {
 		if message.Floor != UNDEFINED {
