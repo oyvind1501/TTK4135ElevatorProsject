@@ -22,7 +22,6 @@ func main() {
 
 	go elev.ActionController(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel)
 	go elev.FiniteStateMachine(motorChannel, lightChannel, floorChannel, doorChannel, requestChannel)
-	//go elev.CheckForOrders(sendOrderChannel)
 	go elev.FreeLockedOrders()
 
 	go elev.MotorController(motorChannel)
@@ -31,7 +30,6 @@ func main() {
 
 	go elevio.PollFloorSensor(floorChannel)
 	go elevio.PollButtons(buttonChannel)
-	//go elev.PrintElevatorInfo()
 	go elev.IdCommunication()
 	go elev.OrderCommunication(sendOrderChannel, receiveOrderChannel, lightChannel, doorChannel)
 
