@@ -4,26 +4,6 @@ import (
 	"time"
 )
 
-type HallOrderElement struct {
-	Command      MessageEvent
-	Direction    MotorDirection
-	Floor        int
-	Status       int
-	ReserveID    string
-	TimeReserved time.Time
-}
-
-type CabOrderElement struct {
-	Floor int
-}
-type ReserveElement struct {
-	Floor int
-}
-
-var HallOrderTable []HallOrderElement
-var CabOrderTable []CabOrderElement
-var ReserveTable []ReserveElement
-
 func IsOrderAt(floor int, direction MotorDirection) bool {
 	for _, element := range HallOrderTable {
 		if element.Floor == floor && element.Direction == direction {
