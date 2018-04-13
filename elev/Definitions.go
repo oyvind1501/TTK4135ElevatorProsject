@@ -13,6 +13,23 @@ type ElevatorOrderMessage struct {
 	Sender     string
 }
 
+
+type HallOrderElement struct {
+	Command      MessageEvent
+	Direction    MotorDirection
+	Floor        int
+	Status       int
+	ReserveID    string
+	TimeReserved time.Time
+}
+
+type CabOrderElement struct {
+	Floor int
+}
+type ReserveElement struct {
+	Floor int
+}
+
 type Action struct {
 	Command   ActionCommand
 	Direction MotorDirection
@@ -89,6 +106,10 @@ const UNDEFINED int = -1
 const UNDEFINED_TARGET_FLOOR int = -1
 const INVALID_FLOOR int = -1
 const MAX_FLOOR_NUMBER int = 4
+
+var HallOrderTable []HallOrderElement
+var CabOrderTable []CabOrderElement
+var ReserveTable []ReserveElement
 
 var isInitialized bool = false
 var isOrderServed bool = false
