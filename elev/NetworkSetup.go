@@ -13,26 +13,6 @@ import (
 	"./network/peers"
 )
 
-type ClientInfo struct {
-	Floor int
-}
-
-type NetClient struct {
-	Id   string
-	Info ClientInfo
-}
-
-type NetworkNode struct {
-	ClientInfo   NetClient
-	ActivityTime time.Time
-}
-
-var ClientTable []NetworkNode
-var masterId string
-var backupId string
-var nodeId string
-var clientInfoInitialized bool = false
-
 func generateElevatorID() string {
 	localIP, err := localip.LocalIP()
 	if err != nil {
