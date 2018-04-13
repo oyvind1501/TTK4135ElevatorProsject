@@ -1,7 +1,7 @@
 package elev
 
 import (
-  "./Network"
+  "./driver/elevio"
 )
 
 type MessageEvent int
