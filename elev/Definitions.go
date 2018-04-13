@@ -25,6 +25,20 @@ type Light struct {
 	FloorNumber int
 }
 
+type ClientInfo struct {
+	Floor int
+}
+
+type NetClient struct {
+	Id   string
+	Info ClientInfo
+}
+
+type NetworkNode struct {
+	ClientInfo   NetClient
+	ActivityTime time.Time
+}
+
 const (
 	INIT       int = 0
 	IDLE       int = 1
@@ -76,15 +90,22 @@ const UNDEFINED_TARGET_FLOOR int = -1
 const INVALID_FLOOR int = -1
 const MAX_FLOOR_NUMBER int = 4
 
+var ClientTable []NetworkNode
+var masterId string
+var backupId string
+var nodeId string
+var clientInfoInitialized bool = false
 
 var open bool
 var doorOpenedAtFloor bool
 var doorOpened bool = false
 var openDoorAtFloor int = UNDEFINED
+
 var hallTarget int = UNDEFINED
 var lastHallTarget int = UNDEFINED
 var LastFloor int
 var TargetFloor int
+// IsIntermediateStop kan tas ut av systemet
 var IsIntermediateStop bool
 var ElevatorDirection MotorDirection
 
