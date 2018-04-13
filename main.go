@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-
 	elevio.Init("localhost:15657", 4)
 	elev.TargetFloor = elev.UNDEFINED_TARGET_FLOOR
 	motorChannel := make(chan elev.MotorDirection)
@@ -34,4 +33,4 @@ func main() {
 	go elev.OrderCommunication(sendOrderChannel, receiveOrderChannel, lightChannel, doorChannel)
 
 	select {}
-}s asdsa
+}
