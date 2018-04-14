@@ -4,6 +4,12 @@ import (
 	"./network/bcast"
 )
 
+/*-----------------------------------------------------
+Function:	OrderCommunication
+Affects:	Hall/cab ligths, clientNetwork and doorlight
+Operation:	Robin
+-----------------------------------------------------*/
+
 func OrderCommunication(sendOrderChannel chan ElevatorOrderMessage, receiveOrderChannel chan ElevatorOrderMessage, lightChannel chan Light, doorChannel chan bool) {
 	go bcast.Transmitter(15100, sendOrderChannel)
 	go bcast.Receiver(15100, receiveOrderChannel)
@@ -20,6 +26,7 @@ func OrderCommunication(sendOrderChannel chan ElevatorOrderMessage, receiveOrder
 				OrderReserveEvent(message, sendOrderChannel)
 			case EVENT_ACK_ORDER_RESERVE:
 				AckOrderReserveEvent(message)
+			// Hva gjør Reserve specific? Trenger vi dem?
 			case EVENT_ORDER_RESERVE_SPECIFIC:
 				OrderReserveSpecificEvent(message, sendOrderChannel)
 			case EVENT_ACK_ORDER_RESERVE_SPECIFIC:
