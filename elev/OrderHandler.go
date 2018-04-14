@@ -5,6 +5,13 @@ import (
 	"time"
 )
 
+/*-----------------------------------------------------
+Function:	IsOrderAt
+Affects:	
+Operation:	Tests to see if an hallorder is at floor
+-----------------------------------------------------*/
+
+
 func IsOrderAt(floor int, direction MotorDirection) bool {
 	for _, element := range HallOrderTable {
 		if element.Floor == floor && element.Direction == direction {
@@ -13,6 +20,12 @@ func IsOrderAt(floor int, direction MotorDirection) bool {
 	}
 	return false
 }
+
+/*-----------------------------------------------------
+Function:	SetOrderStatus
+Affects:	
+Operation:	Gives the client/node the orderinformation from an hallorder
+-----------------------------------------------------*/
 
 func SetOrderStatus(status int, id string, floor int) {
 	if floor == UNDEFINED {
@@ -31,7 +44,12 @@ func SetOrderStatus(status int, id string, floor int) {
 		}
 	}
 }
-
+/*-----------------------------------------------------
+Function:	SetOrderStatus
+Affects:	
+Operation:	When backup is taking over a timer is set 
+		to make Hallorders that are OCCUPIED to AVAILABLE
+-----------------------------------------------------*/
 func FreeLockedOrders() {
 
 	for {
