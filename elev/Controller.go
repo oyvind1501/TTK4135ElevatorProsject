@@ -54,10 +54,12 @@ func LightController(lightChannel chan Light) {
 
 /*-----------------------------------------------------
 Function:	ActionController
-Affects:	Kan du skrive på denne Robin?
+Affects:	Kan du skrive på denne Robin? 
 Operation:	
 -----------------------------------------------------*/
-func ActionController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
+
+// Denne funksjonen kan deles opp i flere funksjoner
+func ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, sendChannel chan ElevatorOrderMessage){
 	for {
 		select {
 		case buttonEvent := <-buttonChannel:
@@ -90,6 +92,14 @@ func ActionController(buttonChannel chan elevio.ButtonEvent, lightChannel chan L
 				}
 				AddCabOrder(buttonEvent.Floor)
 			}
+		}
+	}
+}
+
+func ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
+
+	for {
+		select {
 		case requestEvent := <-requestActionChannel:
 			switch requestEvent.Command {
 			case ACTION_REQUEST_ORDER:
@@ -110,31 +120,35 @@ func ActionController(buttonChannel chan elevio.ButtonEvent, lightChannel chan L
 					Sender: nodeId,
 				}
 			case ACTION_RESET_ALL_LIGHTS:
-				for i := 0; i < (MAX_FLOOR_NUMBER - 1); i++ {
-					lightChannel <- Light{
-						LightType:   BUTTON_HALL_UP,
-						FloorNumber: i,
-						LightOn:     false,
-					}
-				}
-				for i := 0; i < MAX_FLOOR_NUMBER-1; i++ {
-					lightChannel <- Light{
-						LightType:   BUTTON_HALL_DOWN,
-						FloorNumber: i,
-						LightOn:     false,
-					}
-				}
-				for i := 0; i < MAX_FLOOR_NUMBER; i++ {
-					lightChannel <- Light{
-						LightType:   BUTTON_CAB,
-						FloorNumber: i,
-						LightOn:     false,
-					}
-				}
-				elevio.SetDoorOpenLamp(false)
+				ResetLights(lightChannel)
 			}
 		}
 	}
+}
+
+func ResetLights(lightChannel chan Light) {
+	for i := 0; i < (MAX_FLOOR_NUMBER - 1); i++ {
+		lightChannel <- Light{
+		LightType:   BUTTON_HALL_UP,
+		FloorNumber: i,
+		LightOn:     false,
+		}
+	}
+	for i := 0; i < MAX_FLOOR_NUMBER-1; i++ {
+		lightChannel <- Light{
+		LightType:   BUTTON_HALL_DOWN,
+		FloorNumber: i,
+		LightOn:     false,
+		}
+	}
+	for i := 0; i < MAX_FLOOR_NUMBER; i++ {
+		lightChannel <- Light{
+		LightType:   BUTTON_CAB,
+		FloorNumber: i,
+		LightOn:     false,
+		}
+	}
+	elevio.SetDoorOpenLamp(false)
 }
 
 /*-----------------------------------------------------
