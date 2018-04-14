@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+/*-----------------------------------------------------
+Function:	SetState
+Affects:	States
+Operation:	
+-----------------------------------------------------*/
+
 func SetState(requestChannel chan Action, motorChannel chan MotorDirection) {
 	if TargetFloor == LastFloor || TargetFloor == UNDEFINED_TARGET_FLOOR {
 		requestChannel <- Action{
@@ -22,6 +28,12 @@ func SetState(requestChannel chan Action, motorChannel chan MotorDirection) {
 	}
 
 }
+
+/*-----------------------------------------------------
+Function:	FloorAction
+Affects:	Cab/hall lights, doorlights and cabfloors
+Operation:	Sees if the there are cabfloors and sets this to TargetFloor
+-----------------------------------------------------*/
 
 func FloorAction(lightChannel chan Light, doorChannel chan bool, requestChannel chan Action) {
 	if IsCabFloor(LastFloor) {
@@ -58,6 +70,12 @@ func FloorAction(lightChannel chan Light, doorChannel chan bool, requestChannel 
 		time.Sleep(500 * time.Millisecond)
 	}
 }
+
+/*-----------------------------------------------------
+Function:	ServeOrder
+Affects:	Doorlight and requests
+Operation:	
+-----------------------------------------------------*/
 
 func ServeOrder(doorChannel chan bool, requestChannel chan Action) {
 	doorChannel <- true
