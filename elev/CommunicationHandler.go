@@ -221,6 +221,7 @@ func AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 	}
 }
 
+
 func createHallTableElement(message ElevatorOrderMessage) HallOrderElement {
 	tableElement := HallOrderElement{
 		Command:   message.Event,
