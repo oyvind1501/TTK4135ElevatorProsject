@@ -53,7 +53,7 @@ func LightController(lightChannel chan Light) {
 }
 
 /*-----------------------------------------------------
-Function:	ActionController
+Function:	ActionButtonController
 Affects:	Kan du skrive på denne Robin? 
 Operation:	
 -----------------------------------------------------*/
@@ -96,6 +96,12 @@ func ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel 
 	}
 }
 
+/*-----------------------------------------------------
+Function:	ActionRequestController
+Affects:	
+Operation:	
+-----------------------------------------------------*/
+
 func ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
 
 	for {
@@ -126,6 +132,11 @@ func ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel
 	}
 }
 
+/*-----------------------------------------------------
+Function:	ResetLights
+Affects:	Hall/cab lights
+Operation:	Turns off hall and cab lights at the corresponding floor
+-----------------------------------------------------*/
 func ResetLights(lightChannel chan Light) {
 	for i := 0; i < (MAX_FLOOR_NUMBER - 1); i++ {
 		lightChannel <- Light{
