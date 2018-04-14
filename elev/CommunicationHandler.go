@@ -5,9 +5,15 @@ import (
 	"time"
 )
 
+/*-----------------------------------------------------
+Function:	NewOrderEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
+
 func NewOrderEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderMessage) {
 	if nodeId == masterId {
-		tableElement := createTableElement(message)
+		tableElement := createHallTableElement(message)
 		if !isElementInHallTable(tableElement) {
 			HallOrderTable = append(HallOrderTable, tableElement)
 		}
@@ -20,12 +26,18 @@ func NewOrderEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderM
 		}
 	}
 	if nodeId == backupId {
-		tableElement := createTableElement(message)
+		tableElement := createHallTableElement(message)
 		if !isElementInHallTable(tableElement) {
 			HallOrderTable = append(HallOrderTable, tableElement)
 		}
 	}
 }
+
+/*-----------------------------------------------------
+Function:	AckNewOrderEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
 
 func AckNewOrderEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 	var lightButton int
@@ -41,6 +53,12 @@ func AckNewOrderEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 		FloorNumber: message.Floor,
 	}
 }
+
+/*-----------------------------------------------------
+Function:	OrderReserveEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
 
 func OrderReserveEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderMessage) {
 	if nodeId == masterId || nodeId == backupId {
@@ -98,6 +116,12 @@ func OrderReserveEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOr
 	}
 }
 
+/*-----------------------------------------------------
+Function:	AckOrderReserveEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
+
 func AckOrderReserveEvent(message ElevatorOrderMessage) {
 	if message.Origin == nodeId {
 		if message.Floor != UNDEFINED {
@@ -107,6 +131,12 @@ func AckOrderReserveEvent(message ElevatorOrderMessage) {
 		}
 	}
 }
+
+/*-----------------------------------------------------
+Function:	OrderReserveSpecificEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
 
 func OrderReserveSpecificEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderMessage) {
 	if nodeId == masterId {
@@ -130,6 +160,12 @@ func OrderReserveSpecificEvent(message ElevatorOrderMessage, sendChannel chan El
 	}
 }
 
+/*-----------------------------------------------------
+Function:	AckOrderReserveSpecificEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
+
 func AckOrderReserveSpecificEvent(message ElevatorOrderMessage) {
 	if message.Origin == nodeId {
 		if message.Floor != UNDEFINED {
@@ -139,6 +175,12 @@ func AckOrderReserveSpecificEvent(message ElevatorOrderMessage) {
 		}
 	}
 }
+
+/*-----------------------------------------------------
+Function:	OrderDoneEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
 
 func OrderDoneEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderMessage) {
 	if nodeId == masterId {
@@ -157,6 +199,12 @@ func OrderDoneEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrder
 	}
 }
 
+/*-----------------------------------------------------
+Function:	AckOrderDoneEvent
+Affects:
+Operation:
+-----------------------------------------------------*/
+
 func AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 	lightChannel <- Light{
 		LightType:   BUTTON_HALL_UP,
@@ -173,7 +221,7 @@ func AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 	}
 }
 
-func createTableElement(message ElevatorOrderMessage) HallOrderElement {
+func createHallTableElement(message ElevatorOrderMessage) HallOrderElement {
 	tableElement := HallOrderElement{
 		Command:   message.Event,
 		Direction: message.Direction,
@@ -186,14 +234,14 @@ func createTableElement(message ElevatorOrderMessage) HallOrderElement {
 
 func isElementInHallTable(element HallOrderElement) bool {
 	for _, tableElement := range HallOrderTable {
-		if isTableElementEqual(element, tableElement) {
+		if isHallTableElementEqual(element, tableElement) {
 			return true
 		}
 	}
 	return false
 }
 
-func isTableElementEqual(element HallOrderElement, tableElement HallOrderElement) bool {
+func isHallTableElementEqual(element HallOrderElement, tableElement HallOrderElement) bool {
 	if element.Command == tableElement.Command && element.Direction == tableElement.Direction && element.Floor == tableElement.Floor {
 		return true
 	}
