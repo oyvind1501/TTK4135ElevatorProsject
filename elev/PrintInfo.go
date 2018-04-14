@@ -47,26 +47,18 @@ func printCabTable() {
 }
 
 func printCommunicationTable() {
-	var nodeType string
-	var nodeTypeId string
-
+	fmt.Println("----------------Node Network Information----------------")
 	for _, clients := range ClientTable {
 		if clients.ClientInfo.Id == masterId {
-			nodeType = "Master"
-			nodeTypeId = clients.ClientInfo.Id
+			fmt.Println("Master:  ", masterId)
 		}
 		if clients.ClientInfo.Id == backupId {
-			nodeType = "Backup"
-			nodeTypeId = clients.ClientInfo.Id
+			fmt.Println("Backup:  ", backupId)
 		}
 		if clients.ClientInfo.Id != masterId && clients.ClientInfo.Id != backupId {
-			nodeType = "Node"
-			nodeTypeId = clients.ClientInfo.Id
+			fmt.Println("Node:   ", clients.ClientInfo.Id)
 		}
 	}
-	fmt.Println("----------------Node Network Information----------------")
-	fmt.Println("	Type:		", nodeType)
-	fmt.Println("	Id:		", nodeTypeId)
 	fmt.Println("--------------------------------------------------------")
 }
 
