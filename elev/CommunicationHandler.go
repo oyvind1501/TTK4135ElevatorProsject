@@ -1,9 +1,7 @@
 package elev
 
 import (
-	//"fmt"
 	"math"
-	//"strconv"
 	"time"
 )
 
