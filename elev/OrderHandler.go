@@ -23,7 +23,7 @@ func IsOrderAt(floor int, direction MotorDirection) bool {
 
 /*-----------------------------------------------------
 Function:	SetOrderStatus
-Affects:	
+Affects:	HallorderTable
 Operation:	Gives the client/node the orderinformation from an hallorder
 -----------------------------------------------------*/
 
