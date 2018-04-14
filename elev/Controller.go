@@ -6,6 +6,12 @@ import (
 	"./driver/elevio"
 )
 
+/*-----------------------------------------------------
+Function:	MotorController
+Affects:	Motor
+Operation:	Sets the motor to either STOP, DOWN OR UP
+-----------------------------------------------------*/
+
 func MotorController(motorChannel chan MotorDirection) {
 	for {
 		select {
@@ -21,6 +27,12 @@ func MotorController(motorChannel chan MotorDirection) {
 		}
 	}
 }
+
+/*-----------------------------------------------------
+Function:	LigthController
+Affects:	Hall/cab lights
+Operation:	Sets the Hall/cab lights to on
+-----------------------------------------------------*/
 
 func LightController(lightChannel chan Light) {
 	for {
@@ -40,6 +52,11 @@ func LightController(lightChannel chan Light) {
 	}
 }
 
+/*-----------------------------------------------------
+Function:	ActionController
+Affects:	Kan du skrive på denne Robin?
+Operation:	
+-----------------------------------------------------*/
 func ActionController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
 	for {
 		select {
@@ -120,6 +137,12 @@ func ActionController(buttonChannel chan elevio.ButtonEvent, lightChannel chan L
 	}
 }
 
+/*-----------------------------------------------------
+Function:	DoorController
+Affects:	doorlight
+Operation:	Sees if its necessary to turn on the doorligt
+-----------------------------------------------------*/
+
 func DoorController(doorChannel chan bool) {
 	for {
 		select {
@@ -133,6 +156,11 @@ func DoorController(doorChannel chan bool) {
 	}
 }
 
+/*-----------------------------------------------------
+Function:	OpenDoorAction
+Affects:	doorlight
+Operation:	Turns on the doorlight for 2 seconds
+-----------------------------------------------------*/
 func openDoorAction() {
 	elevio.SetDoorOpenLamp(true)
 	time.Sleep(2 * time.Second)
