@@ -1,6 +1,7 @@
 package elev
 
 import (
+	"math/rand"
 	"time"
 )
 
@@ -304,6 +305,16 @@ func IsHallOrderReserved(floor int) bool {
 	return isReserved
 }
 
+func SelectRandom(floorA int, floorB int) int {
+	seed := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(seed)
+	if random.Intn(100) > 50 {
+		return floorA
+	} else {
+		return floorB
+	}
+}
+
 func ClosestFloor(floor int) int {
 	nextFloor := UNDEFINED
 	if HallOrderAbove(floor) && HallOrderBelow(floor) {
@@ -311,10 +322,12 @@ func ClosestFloor(floor int) int {
 		floorBelow := GetHallOrderBelow(floor)
 		distanceAbove := floor - floorAbove
 		distanceBelow := floorBelow - floor
-		if distanceBelow <= distanceAbove {
+		if distanceBelow < distanceAbove {
 			nextFloor = floorBelow
-		} else {
+		} else if distanceBelow > distanceBelow {
 			nextFloor = floorAbove
+		} else {
+			nextFloor = SelectRandom(floorAbove, floorBelow)
 		}
 	} else if HallOrderAbove(floor) {
 		nextFloor = GetHallOrderAbove(floor)

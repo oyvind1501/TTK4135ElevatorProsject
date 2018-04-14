@@ -125,8 +125,6 @@ Operation:
 func AckOrderReserveEvent(message ElevatorOrderMessage) {
 	if message.Origin == nodeId {
 		if message.Floor != UNDEFINED {
-			hallTarget = message.Floor
-			doorOpened = false
 			TargetFloor = message.Floor
 		}
 	}
@@ -216,11 +214,7 @@ func AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light) {
 		LightOn:     false,
 		FloorNumber: message.Floor,
 	}
-	if message.Origin == nodeId && doorOpened == false {
-		open = true
-	}
 }
-
 
 func createHallTableElement(message ElevatorOrderMessage) HallOrderElement {
 	tableElement := HallOrderElement{

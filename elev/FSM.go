@@ -4,6 +4,9 @@ import (
 	"time"
 )
 
+var nowFloor int
+var elevDir MotorDirection
+
 /*-----------------------------------------------------
 Function:	initstate
 Affects:	states, floors, motor and lights
@@ -41,7 +44,6 @@ func initState(motorChannel chan MotorDirection, floorChannel chan int, requestC
 	previousState = INIT
 }
 
-
 /*-----------------------------------------------------
 Function:	idle
 Affects:	State, doorlights, floorlights, motor
@@ -50,19 +52,30 @@ Operation:	Kan du skrive hva denne gjør Robin?
 
 func idle(motorChannel chan MotorDirection, lightChannel chan Light, doorChannel chan bool, requestChannel chan Action) {
 	if previousState != IDLE {
-
 		motorChannel <- DIR_STOP
-	}
-	if open && LastFloor == hallTarget && lastHallTarget != hallTarget {
-		doorChannel <- true
-		open = false
-		doorOpened = true
-		lastHallTarget = LastFloor
+
+		if nowFloor < LastFloor {
+			elevDir = DIR_DOWN
+		} else if nowFloor > LastFloor {
+			elevDir = DIR_UP
+		} else {
+			elevDir = DIR_STOP
+		}
+		requestChannel <- Action{
+			Command:   ACTION_REQUEST_SPECIFIC_ORDER,
+			Direction: elevDir,
+			Floor:     LastFloor,
+		}
+		nowFloor = LastFloor
+		time.Sleep(1 * time.Second) // Timer to compensate for RTT - delay required to obtain the ACTION_REQUEST_SPECIFIC_ORDER - request!
+		if IsIntermediateStop == true {
+			ServeOrder(doorChannel, requestChannel)
+		}
+		IsIntermediateStop = false
 	}
 	if openDoorAtFloor == LastFloor && doorOpenedAtFloor == true {
-		doorChannel <- true
 		doorOpenedAtFloor = false
-		time.Sleep(2 * time.Second)
+		ServeOrder(doorChannel, requestChannel)
 	}
 	FloorAction(lightChannel, doorChannel, requestChannel)
 	SetState(requestChannel, motorChannel)
@@ -109,7 +122,7 @@ func down(motorChannel chan MotorDirection, floorChannel chan int) {
 /*-----------------------------------------------------
 Function:	floorup
 Affects:	Motor, hall/cab lights and floor
-Operation:	Moves the elevator to a floor above 
+Operation:	Moves the elevator to a floor above
 		Turns on the cab/hall lights
 		Sets the motordirection to stop when the destination is reached
 		Sees if the target floor was a floor up
@@ -120,9 +133,9 @@ func floorUp(motorChannel chan MotorDirection, lightChannel chan Light, floorCha
 	for {
 		floorPoll = ReadFloorSensor(floorChannel)
 		if floorPoll != UNDEFINED_TARGET_FLOOR {
+			UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
 			if floorPoll == TargetFloor {
 				motorChannel <- DIR_STOP
-				UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
 				lightChannel <- Light{
 					LightType:   BUTTON_CAB,
 					LightOn:     false,
@@ -140,7 +153,7 @@ func floorUp(motorChannel chan MotorDirection, lightChannel chan Light, floorCha
 /*-----------------------------------------------------
 Function:	floordown
 Affects:	Motor, hall/cab lights and floor
-Operation:	Moves the elevator to a floor below 
+Operation:	Moves the elevator to a floor below
 		Turns on the cab/hall lights when the destiniation is reached
 		Sets the motordirection to stop when the destination is reached
 -----------------------------------------------------*/
@@ -150,9 +163,9 @@ func floorDown(motorChannel chan MotorDirection, lightChannel chan Light, floorC
 	for {
 		floorPoll = ReadFloorSensor(floorChannel)
 		if floorPoll != UNDEFINED_TARGET_FLOOR {
+			UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
 			if floorPoll == TargetFloor {
 				motorChannel <- DIR_STOP
-				UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
 				lightChannel <- Light{
 					LightType:   BUTTON_CAB,
 					LightOn:     false,
