@@ -13,6 +13,12 @@ import (
 	"./network/peers"
 )
 
+/*-----------------------------------------------------
+Function:	generateElevatorID
+Affects:	Clientid
+Operation:	Gets the IP-adress from an incoming client
+-----------------------------------------------------*/
+
 func generateElevatorID() string {
 	localIP, err := localip.LocalIP()
 	if err != nil {
@@ -22,9 +28,22 @@ func generateElevatorID() string {
 	return id
 }
 
+/*-----------------------------------------------------
+Function:	extractIdentifier
+Affects:	
+Operation:	Splits the IP-adress string into its last 4 digits.
+-----------------------------------------------------*/
+
 func extractIdentifier(nodeElement NetworkNode) string {
 	return strings.Split(nodeElement.ClientInfo.Id, "-")[2]
 }
+
+/*-----------------------------------------------------
+Function:	addNode
+Affects:	ClientTable
+Operation:	Adds a new client/node,which is connected to 
+		the network, to the ClientTable.
+-----------------------------------------------------*/
 
 func addNode(peerUpdateMessage peers.PeerUpdate) {
 	newNodeId := peerUpdateMessage.New
@@ -51,6 +70,11 @@ func addNode(peerUpdateMessage peers.PeerUpdate) {
 	}
 }
 
+/*-----------------------------------------------------
+Function:	removeNode
+Affects:	ClientTable
+Operation:	Removes an client/node from the clientTable when the client/node becomes offline
+-----------------------------------------------------*/
 func removeNode(peerUpdateMessage peers.PeerUpdate) {
 	lostNodesId := peerUpdateMessage.Lost
 
@@ -72,6 +96,12 @@ func removeNode(peerUpdateMessage peers.PeerUpdate) {
 		}
 	}
 }
+
+/*-----------------------------------------------------
+Function:	setMasterId
+Affects:	ClientTable
+Operation:	Makes the client/node with the smallest 4 digits in the IP-information become the master
+-----------------------------------------------------*/
 
 func setMasterId(peerUpdateMessage peers.PeerUpdate) {
 	if len(ClientTable) == 0 {
@@ -98,6 +128,11 @@ func setMasterId(peerUpdateMessage peers.PeerUpdate) {
 	masterId = masterCandidate.ClientInfo.Id
 }
 
+/*-----------------------------------------------------
+Function:	setBackupId
+Affects:	ClientTable
+Operation:	Makes the client/node with the nextsmallest 4 digits in the IP-information become the backup
+-----------------------------------------------------*/
 func setBackupId(peerUpdateMessage peers.PeerUpdate) {
 	if len(ClientTable) == 0 {
 		return
@@ -127,6 +162,11 @@ func setBackupId(peerUpdateMessage peers.PeerUpdate) {
 	}
 }
 
+/*-----------------------------------------------------
+Function:	setBackupId
+Affects:	ClientTable
+Operation:	Uses the addnode and removenode function to update the ClientTable
+-----------------------------------------------------*/
 func updateClientTable(peerUpdateMessage peers.PeerUpdate) {
 	if peerUpdateMessage.New != "" {
 		addNode(peerUpdateMessage)
@@ -135,6 +175,11 @@ func updateClientTable(peerUpdateMessage peers.PeerUpdate) {
 		removeNode(peerUpdateMessage)
 	}
 }
+/*-----------------------------------------------------
+Function:	AddClientInfo
+Affects:	ClientTable
+Operation:	Puts the clientinformation for each client/node in the clientTable
+-----------------------------------------------------*/
 func AddClientInfo(message NetClient) {
 	for index, node := range ClientTable {
 		if message.Id == node.ClientInfo.Id {
@@ -145,7 +190,11 @@ func AddClientInfo(message NetClient) {
 		}
 	}
 }
-
+/*-----------------------------------------------------
+Function:	SendClientInfo
+Affects:	clientinforamtion to the client network
+Operation:	Sets the clientinformation to be sent to the client network 
+-----------------------------------------------------*/
 func sendClientInfo(messageChannel chan NetClient) {
 	for {
 		var clientInformation ClientInfo
@@ -167,6 +216,12 @@ func sendClientInfo(messageChannel chan NetClient) {
 		time.Sleep(time.Millisecond * 100)
 	}
 }
+
+/*-----------------------------------------------------
+Function:	IdCommunication
+Affects:	
+Operation:	Broadcasts client information, master, backup, and ids to all nodes in the clientNetwork
+-----------------------------------------------------*/
 
 func IdCommunication() {
 	var id string
