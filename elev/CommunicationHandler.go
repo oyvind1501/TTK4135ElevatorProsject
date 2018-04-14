@@ -61,6 +61,26 @@ Operation:
 -----------------------------------------------------*/
 
 func OrderReserveEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOrderMessage) {
+	nextFloor := SetBestParticipantFloor(message)
+	if nodeId == masterId {
+		sendChannel <- ElevatorOrderMessage{
+			Event:      EVENT_ACK_ORDER_RESERVE,
+			Floor:      nextFloor,
+			AssignedTo: message.Origin,
+			Origin:     message.Origin,
+			Sender:     masterId,
+		}
+	}
+}
+
+/*-----------------------------------------------------
+Function:	SetBestParticipantFloor
+Affects:	Halltable
+Operation:	Finds the best suited client in the client network
+			for an incoming hallorder
+-----------------------------------------------------*/
+
+func SetBestParticipantFloor(message ElevatorOrderMessage) int {
 	if nodeId == masterId || nodeId == backupId {
 		nextFloor := UNDEFINED
 
@@ -96,24 +116,18 @@ func OrderReserveEvent(message ElevatorOrderMessage, sendChannel chan ElevatorOr
 
 		}
 		if bestParticipantId != message.Origin {
-			return
+			return -1
 		}
 		isReserved := IsHallOrderReserved(nextFloor)
 		if isReserved {
-			return
+			return -1
 		}
 
 		SetOrderStatus(STATUS_OCCUPIED, message.Origin, nextFloor)
-		if nodeId == masterId {
-			sendChannel <- ElevatorOrderMessage{
-				Event:      EVENT_ACK_ORDER_RESERVE,
-				Floor:      nextFloor,
-				AssignedTo: message.Origin,
-				Origin:     message.Origin,
-				Sender:     masterId,
-			}
-		}
+
+		return nextFloor
 	}
+	return -1
 }
 
 /*-----------------------------------------------------
