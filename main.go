@@ -17,7 +17,8 @@ func main() {
 	sendOrderChannel := make(chan elev.ElevatorOrderMessage)
 	receiveOrderChannel := make(chan elev.ElevatorOrderMessage)
 
-	go elev.ActionController(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel)
+	go elev.ActionButtonController(buttonChannel, lightChannel, doorChannel, sendChannel)
+	go elev.ActionRequestController(buttonChannel, lightChannel, doorChannel, requestActionChannel, sendChannel)
 	go elev.FiniteStateMachine(motorChannel, lightChannel, floorChannel, doorChannel, requestChannel)
 	go elev.FreeLockedOrders()
 
