@@ -1,7 +1,7 @@
 package elev
 
 import (
-  "./driver/elevio"
+	"time"
 )
 
 type MessageEvent int
@@ -16,7 +16,6 @@ type ElevatorOrderMessage struct {
 	Origin     string
 	Sender     string
 }
-
 
 type HallOrderElement struct {
 	Command      MessageEvent
@@ -106,16 +105,6 @@ const (
 	STATUS_OCCUPIED  int = 1
 )
 
-MotorChannel := make(chan MotorDirection)
-LightChannel := make(chan Light)
-DoorChannel := make(chan bool)
-FloorChannel := make(chan int)
-ButtonChannel := make(chan elevio.ButtonEvent)
-RequestChannel := make(chan Action)
-SendOrderChannel := make(chan ElevatorOrderMessage)
-ReceiveOrderChannel := make(chan ElevatorOrderMessage)
-
-
 const UNDEFINED int = -1
 const UNDEFINED_TARGET_FLOOR int = -1
 const INVALID_FLOOR int = -1
@@ -145,6 +134,7 @@ var hallTarget int = UNDEFINED
 var lastHallTarget int = UNDEFINED
 var LastFloor int
 var TargetFloor int
+
 // IsIntermediateStop kan tas ut av systemet
 var IsIntermediateStop bool
 
@@ -164,4 +154,3 @@ func UpdateFloorIndicator(floorNumber int, prevFloorNumber int, lightChannel cha
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: false, FloorNumber: prevFloorNumber}
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: true, FloorNumber: floorNumber}
 }
-

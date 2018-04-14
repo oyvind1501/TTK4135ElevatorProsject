@@ -1,7 +1,7 @@
 package elev
 
 import (
-	"fmt"
+	//"fmt"
 	"time"
 
 	"./driver/elevio"

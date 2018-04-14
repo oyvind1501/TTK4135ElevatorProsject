@@ -1,9 +1,10 @@
 package elev
 
-import "fmt"
-
-
-
+import (
+	"fmt"
+	"strconv"
+	"time"
+)
 
 func printHallTable() {
 	fmt.Println("-----------------Hall Order Table:----------------------")
@@ -86,13 +87,13 @@ func printStateInfo() {
 
 func PrintElevatorInfo() {
 	for {
-		PrintCommunicationTable()
+		printCommunicationTable()
 		fmt.Println()
-		PrintStateInfo()
+		printStateInfo()
 		fmt.Println()
-		PrintCabTable()
+		printCabTable()
 		fmt.Println()
-		PrintHallTable()
+		printHallTable()
 		fmt.Println()
 
 		time.Sleep(500 * time.Millisecond)
