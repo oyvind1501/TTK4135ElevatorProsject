@@ -12,7 +12,7 @@ Affects:	Motor
 Operation:	Sets the motor to either STOP, DOWN OR UP
 -----------------------------------------------------*/
 
-func MotorController(motorChannel chan MotorDirection) {
+func Core_MotorController(motorChannel chan MotorDirection) {
 	for {
 		select {
 		case command := <-motorChannel:
@@ -29,12 +29,12 @@ func MotorController(motorChannel chan MotorDirection) {
 }
 
 /*-----------------------------------------------------
-Function:	LigthController
+Function:	LightController
 Affects:	Hall/cab lights
 Operation:	Sets the Hall/cab lights to on
 -----------------------------------------------------*/
 
-func LightController(lightChannel chan Light) {
+func Core_LightController(lightChannel chan Light) {
 	for {
 		select {
 		case command := <-lightChannel:
@@ -54,12 +54,10 @@ func LightController(lightChannel chan Light) {
 
 /*-----------------------------------------------------
 Function:	ActionButtonController
-Affects:	Kan du skrive på denne Robin? 
-Operation:	
+Operation:
 -----------------------------------------------------*/
 
-// Denne funksjonen kan deles opp i flere funksjoner
-func ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, sendChannel chan ElevatorOrderMessage){
+func Core_ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, sendChannel chan ElevatorOrderMessage) {
 	for {
 		select {
 		case buttonEvent := <-buttonChannel:
@@ -90,7 +88,7 @@ func ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel 
 					FloorNumber: buttonEvent.Floor,
 					LightOn:     true,
 				}
-				AddCabOrder(buttonEvent.Floor)
+				Core_AddCabOrder(buttonEvent.Floor)
 			}
 		}
 	}
@@ -98,18 +96,15 @@ func ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel 
 
 /*-----------------------------------------------------
 Function:	ActionRequestController
-Affects:	
-Operation:	
+Operation:
 -----------------------------------------------------*/
-
-func ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
-
+func Core_ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
 	for {
 		select {
 		case requestEvent := <-requestActionChannel:
 			switch requestEvent.Command {
 			case ACTION_REQUEST_ORDER:
-				CheckForOrders(sendChannel)
+				Core_CheckForOrders(sendChannel)
 			case ACTION_REQUEST_SPECIFIC_ORDER:
 				sendChannel <- ElevatorOrderMessage{
 					Event:     EVENT_ORDER_RESERVE_SPECIFIC,
@@ -126,37 +121,32 @@ func ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel
 					Sender: nodeId,
 				}
 			case ACTION_RESET_ALL_LIGHTS:
-				ResetLights(lightChannel)
+				core_resetLightsController(lightChannel)
 			}
 		}
 	}
 }
 
-/*-----------------------------------------------------
-Function:	ResetLights
-Affects:	Hall/cab lights
-Operation:	Turns off hall and cab lights at the corresponding floor
------------------------------------------------------*/
-func ResetLights(lightChannel chan Light) {
+func core_resetLightsController(lightChannel chan Light) {
 	for i := 0; i < (MAX_FLOOR_NUMBER - 1); i++ {
 		lightChannel <- Light{
-		LightType:   BUTTON_HALL_UP,
-		FloorNumber: i,
-		LightOn:     false,
+			LightType:   BUTTON_HALL_UP,
+			FloorNumber: i,
+			LightOn:     false,
 		}
 	}
 	for i := 0; i < MAX_FLOOR_NUMBER-1; i++ {
 		lightChannel <- Light{
-		LightType:   BUTTON_HALL_DOWN,
-		FloorNumber: i,
-		LightOn:     false,
+			LightType:   BUTTON_HALL_DOWN,
+			FloorNumber: i,
+			LightOn:     false,
 		}
 	}
 	for i := 0; i < MAX_FLOOR_NUMBER; i++ {
 		lightChannel <- Light{
-		LightType:   BUTTON_CAB,
-		FloorNumber: i,
-		LightOn:     false,
+			LightType:   BUTTON_CAB,
+			FloorNumber: i,
+			LightOn:     false,
 		}
 	}
 	elevio.SetDoorOpenLamp(false)
@@ -168,12 +158,12 @@ Affects:	doorlight
 Operation:	Sees if its necessary to turn on the doorligt
 -----------------------------------------------------*/
 
-func DoorController(doorChannel chan bool) {
+func Core_DoorController(doorChannel chan bool) {
 	for {
 		select {
 		case openDoor := <-doorChannel:
 			if openDoor {
-				openDoorAction()
+				Core_OpenDoorActionController()
 			} else {
 				elevio.SetDoorOpenLamp(false)
 			}
@@ -186,8 +176,28 @@ Function:	OpenDoorAction
 Affects:	doorlight
 Operation:	Turns on the doorlight for 2 seconds
 -----------------------------------------------------*/
-func openDoorAction() {
+func Core_OpenDoorActionController() {
 	elevio.SetDoorOpenLamp(true)
 	time.Sleep(2 * time.Second)
 	elevio.SetDoorOpenLamp(false)
+}
+
+func Core_ReadFloorSensorController(floorChannel chan int) int {
+	select {
+	case floor := <-floorChannel:
+		return floor
+	default:
+		return INVALID_FLOOR
+	}
+}
+
+/*-----------------------------------------------------
+Function:	OpenDoorAction
+Affects:
+Operation:	Robin
+-----------------------------------------------------*/
+
+func Core_UpdateFloorIndicatorController(floorNumber int, prevFloorNumber int, lightChannel chan Light) {
+	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: false, FloorNumber: prevFloorNumber}
+	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: true, FloorNumber: floorNumber}
 }

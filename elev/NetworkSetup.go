@@ -13,13 +13,12 @@ import (
 	"./network/peers"
 )
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	generateElevatorID
 Affects:	Clientid
 Operation:	Gets the IP-adress from an incoming client
------------------------------------------------------*/
-
-func generateElevatorID() string {
+------------------------------------------------------------------------------*/
+func net_generateElevatorID() string {
 	localIP, err := localip.LocalIP()
 	if err != nil {
 		localIP = "DISCONNECTED"
@@ -28,24 +27,24 @@ func generateElevatorID() string {
 	return id
 }
 
-/*-----------------------------------------------------
-Function:	extractIdentifier
-Affects:	
+/*------------------------------------------------------------------------------
+Function:		extractIdentifier
 Operation:	Splits the IP-adress string into its last 4 digits.
------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 
-func extractIdentifier(nodeElement NetworkNode) string {
+func net_extractIdentifier(nodeElement NetworkNode) string {
 	return strings.Split(nodeElement.ClientInfo.Id, "-")[2]
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	addNode
 Affects:	ClientTable
-Operation:	Adds a new client/node,which is connected to 
-		the network, to the ClientTable.
------------------------------------------------------*/
+Operation:
+Adds a new client/node,which is connected to
+the network, to the ClientTable.
+------------------------------------------------------------------------------*/
 
-func addNode(peerUpdateMessage peers.PeerUpdate) {
+func net_addNode(peerUpdateMessage peers.PeerUpdate) {
 	newNodeId := peerUpdateMessage.New
 	if newNodeId == "" {
 		return
@@ -70,12 +69,13 @@ func addNode(peerUpdateMessage peers.PeerUpdate) {
 	}
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	removeNode
 Affects:	ClientTable
-Operation:	Removes an client/node from the clientTable when the client/node becomes offline
------------------------------------------------------*/
-func removeNode(peerUpdateMessage peers.PeerUpdate) {
+Operation:	Removes an client/node from the clientTable when the
+client/node becomes offline
+------------------------------------------------------------------------------*/
+func net_removeNode(peerUpdateMessage peers.PeerUpdate) {
 	lostNodesId := peerUpdateMessage.Lost
 
 	shouldRemove := false
@@ -97,13 +97,14 @@ func removeNode(peerUpdateMessage peers.PeerUpdate) {
 	}
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	setMasterId
 Affects:	ClientTable
-Operation:	Makes the client/node with the smallest 4 digits in the IP-information become the master
------------------------------------------------------*/
+Operation:	Makes the client/node with the smallest 4 digits in the
+IP-information become the master
+------------------------------------------------------------------------------*/
 
-func setMasterId(peerUpdateMessage peers.PeerUpdate) {
+func net_setMasterId(peerUpdateMessage peers.PeerUpdate) {
 	if len(ClientTable) == 0 {
 		return
 	}
@@ -115,7 +116,7 @@ func setMasterId(peerUpdateMessage peers.PeerUpdate) {
 		if nodeElement.ClientInfo.Id == "" {
 			return
 		}
-		currentIdentifier, _ := strconv.Atoi(extractIdentifier(nodeElement))
+		currentIdentifier, _ := strconv.Atoi(net_extractIdentifier(nodeElement))
 		if index == 0 {
 			smallestIdentifier = currentIdentifier
 			masterCandidate = nodeElement
@@ -128,12 +129,14 @@ func setMasterId(peerUpdateMessage peers.PeerUpdate) {
 	masterId = masterCandidate.ClientInfo.Id
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	setBackupId
 Affects:	ClientTable
-Operation:	Makes the client/node with the nextsmallest 4 digits in the IP-information become the backup
------------------------------------------------------*/
-func setBackupId(peerUpdateMessage peers.PeerUpdate) {
+Operation:
+Makes the client/node with the nextsmallest 4 digits in the
+IP-information become the backup
+------------------------------------------------------------------------------*/
+func net_setBackupId(peerUpdateMessage peers.PeerUpdate) {
 	if len(ClientTable) == 0 {
 		return
 	}
@@ -144,7 +147,7 @@ func setBackupId(peerUpdateMessage peers.PeerUpdate) {
 		if nodeElement.ClientInfo.Id == "" {
 			return
 		}
-		currentIdentifier, _ := strconv.Atoi(extractIdentifier(nodeElement))
+		currentIdentifier, _ := strconv.Atoi(net_extractIdentifier(nodeElement))
 		listOfNodeIds = append(listOfNodeIds, currentIdentifier)
 	}
 
@@ -154,7 +157,7 @@ func setBackupId(peerUpdateMessage peers.PeerUpdate) {
 		sort.Sort(sort.IntSlice(listOfNodeIds))
 		backupIdentifier := strconv.Itoa(listOfNodeIds[1])
 		for _, backupCandidate := range ClientTable {
-			currentIdentifier := extractIdentifier(backupCandidate)
+			currentIdentifier := net_extractIdentifier(backupCandidate)
 			if currentIdentifier == backupIdentifier {
 				backupId = backupCandidate.ClientInfo.Id
 			}
@@ -162,25 +165,26 @@ func setBackupId(peerUpdateMessage peers.PeerUpdate) {
 	}
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	setBackupId
 Affects:	ClientTable
 Operation:	Uses the addnode and removenode function to update the ClientTable
------------------------------------------------------*/
-func updateClientTable(peerUpdateMessage peers.PeerUpdate) {
+------------------------------------------------------------------------------*/
+func net_updateClientTable(peerUpdateMessage peers.PeerUpdate) {
 	if peerUpdateMessage.New != "" {
-		addNode(peerUpdateMessage)
+		net_addNode(peerUpdateMessage)
 	}
 	if len(peerUpdateMessage.Lost) != 0 {
-		removeNode(peerUpdateMessage)
+		net_removeNode(peerUpdateMessage)
 	}
 }
-/*-----------------------------------------------------
+
+/*------------------------------------------------------------------------------
 Function:	AddClientInfo
 Affects:	ClientTable
 Operation:	Puts the clientinformation for each client/node in the clientTable
------------------------------------------------------*/
-func AddClientInfo(message NetClient) {
+------------------------------------------------------------------------------*/
+func Net_AddClientInfo(message NetClient) {
 	for index, node := range ClientTable {
 		if message.Id == node.ClientInfo.Id {
 			ClientTable[index] = NetworkNode{
@@ -190,12 +194,13 @@ func AddClientInfo(message NetClient) {
 		}
 	}
 }
-/*-----------------------------------------------------
+
+/*------------------------------------------------------------------------------
 Function:	SendClientInfo
 Affects:	clientinforamtion to the client network
-Operation:	Sets the clientinformation to be sent to the client network 
------------------------------------------------------*/
-func sendClientInfo(messageChannel chan NetClient) {
+Operation:	Sets the clientinformation to be sent to the client network
+------------------------------------------------------------------------------*/
+func net_sendClientInfo(messageChannel chan NetClient) {
 	for {
 		var clientInformation ClientInfo
 		if !clientInfoInitialized {
@@ -217,15 +222,42 @@ func sendClientInfo(messageChannel chan NetClient) {
 	}
 }
 
-/*-----------------------------------------------------
-Function:	IdCommunication
-Affects:	
-Operation:	Broadcasts client information, master, backup, and ids to all nodes in the clientNetwork
------------------------------------------------------*/
+/*------------------------------------------------------------------------------
+Function:		FreeLockedOrders
+Operation:
+Sets the status of orders, that has been occupied for a long time,
+to STATUS_AVAILABLE. This do free potentially locked/non-served orders, if any
+issues should arise.
+------------------------------------------------------------------------------*/
+func Net_FreeOCCUPIEDOrders() {
+	for {
+		if nodeId == masterId || nodeId == backupId {
+			thresholdTime := 10
+			for _, tableElement := range HallOrderTable {
+				if tableElement.TimeReserved.Second() == 0 {
+					continue
+				}
+				sinceLastTimestamp := time.Since(tableElement.TimeReserved)
+				secondsElapsed := int(sinceLastTimestamp.Seconds())
+				if secondsElapsed >= thresholdTime {
+					Core_SetOrderStatus(STATUS_AVAILABLE, tableElement.ReserveID, tableElement.Floor)
+				}
+			}
+			time.Sleep(2 * time.Second)
+		}
+	}
+}
 
-func IdCommunication() {
+/*------------------------------------------------------------------------------
+Function:	IdCommunication
+Affects:
+Operation:	Broadcasts client information, master, backup,
+and ids to all nodes in the clientNetwork
+------------------------------------------------------------------------------*/
+
+func Net_ClientInfoCommunication() {
 	var id string
-	id = generateElevatorID()
+	id = net_generateElevatorID()
 	nodeId = id
 
 	peerUpdateCh := make(chan peers.PeerUpdate)
@@ -235,7 +267,7 @@ func IdCommunication() {
 
 	outgoingMessageChannel := make(chan NetClient)
 	incomingMessageChannel := make(chan NetClient)
-	go sendClientInfo(outgoingMessageChannel)
+	go net_sendClientInfo(outgoingMessageChannel)
 
 	go bcast.Transmitter(15254, outgoingMessageChannel)
 	go bcast.Receiver(15254, incomingMessageChannel)
@@ -243,11 +275,11 @@ func IdCommunication() {
 	for {
 		select {
 		case peerUpdateMessage := <-peerUpdateCh:
-			updateClientTable(peerUpdateMessage)
-			setMasterId(peerUpdateMessage)
-			setBackupId(peerUpdateMessage)
+			net_updateClientTable(peerUpdateMessage)
+			net_setMasterId(peerUpdateMessage)
+			net_setBackupId(peerUpdateMessage)
 		case message := <-incomingMessageChannel:
-			AddClientInfo(message)
+			Net_AddClientInfo(message)
 		}
 	}
 }

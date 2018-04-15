@@ -4,18 +4,17 @@ import (
 	"time"
 )
 
-var nowFloor int
-var elevDir MotorDirection
+/*------------------------------------------------------------------------------
+Function:	initState
+Affects: 	State, motor, hall/cab lights and doorlight
+Operation:
+ - Initilizes the elevator to move to the closest floor if the floorsensor
+	 is UNDEFINED.
+ - Resets all lights
+ - Sets the state to IDLE
+------------------------------------------------------------------------------*/
 
-/*-----------------------------------------------------
-Function:	initstate
-Affects:	states, floors, motor and lights
-Operation:	Initilizes the elevator to move to the closest floor if the floorsensor is UNDEFINED.
-		Resets all lights
-		Sets the state to IDLE
------------------------------------------------------*/
-
-func initState(motorChannel chan MotorDirection, floorChannel chan int, requestChannel chan Action) {
+func core_initState(motorChannel chan MotorDirection, floorChannel chan int, requestChannel chan Action) {
 	if isInitialized {
 		state = IDLE
 	}
@@ -25,7 +24,7 @@ func initState(motorChannel chan MotorDirection, floorChannel chan int, requestC
 	}
 	var elevatorIsApproaching bool = false
 	for {
-		floor := ReadFloorSensor(floorChannel)
+		floor := Core_ReadFloorSensorController(floorChannel)
 		if floor == INVALID_FLOOR && elevatorIsApproaching == false {
 			motorChannel <- DIR_DOWN
 			LastFloor = INVALID_FLOOR
@@ -44,13 +43,17 @@ func initState(motorChannel chan MotorDirection, floorChannel chan int, requestC
 	previousState = INIT
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	idle
 Affects:	State, doorlights, floorlights, motor
-Operation:	Kan du skrive hva denne gjør Robin?
------------------------------------------------------*/
-
-func idle(motorChannel chan MotorDirection, lightChannel chan Light, doorChannel chan bool, requestChannel chan Action) {
+Operation:
+Idle is activated upon arrival at a valid floor, and performes all nessesary
+actions when the elevator is standing fixed at a valid floor. That is:
+ -	Idle stops the elevator, opens the door (if required), before setting the
+ 		next state of the elevator.
+ - 	Idle will also send out order requests if required.
+------------------------------------------------------------------------------*/
+func core_idle(motorChannel chan MotorDirection, lightChannel chan Light, doorChannel chan bool, requestChannel chan Action) {
 	if previousState != IDLE {
 		motorChannel <- DIR_STOP
 
@@ -67,30 +70,32 @@ func idle(motorChannel chan MotorDirection, lightChannel chan Light, doorChannel
 			Floor:     LastFloor,
 		}
 		nowFloor = LastFloor
-		time.Sleep(1 * time.Second) // Timer to compensate for RTT - delay required to obtain the ACTION_REQUEST_SPECIFIC_ORDER - request!
+		// Timer to compensate for RTT - delay required to obtain the ACTION_REQUEST_SPECIFIC_ORDER - request
+		time.Sleep(1 * time.Second)
 		if IsIntermediateStop == true {
-			ServeOrder(doorChannel, requestChannel)
+			Core_ServeOrder(doorChannel, requestChannel)
 		}
 		IsIntermediateStop = false
 	}
 	if openDoorAtFloor == LastFloor && doorOpenedAtFloor == true {
 		doorOpenedAtFloor = false
-		ServeOrder(doorChannel, requestChannel)
+		Core_ServeOrder(doorChannel, requestChannel)
 	}
-	FloorAction(lightChannel, doorChannel, requestChannel)
-	SetState(requestChannel, motorChannel)
+	Core_TargetFloorAction(lightChannel, doorChannel, requestChannel)
+	Core_SetState(requestChannel, motorChannel)
 
 	previousState = IDLE
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	up
 Affects:	Motor, direction, state
-Operation:	Sets the motordirection, state and direction to upwards
------------------------------------------------------*/
+Operation:
+Sets the elevator direction and state to go 'up', if allowed.
+------------------------------------------------------------------------------*/
 
-func up(motorChannel chan MotorDirection, floorChannel chan int) {
-	floor := ReadFloorSensor(floorChannel)
+func core_up(motorChannel chan MotorDirection, floorChannel chan int) {
+	floor := Core_ReadFloorSensorController(floorChannel)
 	if floor == MAX_FLOOR_NUMBER {
 		state = DOWN
 		return
@@ -101,14 +106,15 @@ func up(motorChannel chan MotorDirection, floorChannel chan int) {
 	previousState = UP
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	down
 Affects:	Motor, direction, state
-Operation:	Sets the motordirection, state and direction to downwards
------------------------------------------------------*/
+Operation:
+Sets the motordirection, state and direction to downwards
+------------------------------------------------------------------------------*/
 
-func down(motorChannel chan MotorDirection, floorChannel chan int) {
-	floor := ReadFloorSensor(floorChannel)
+func core_down(motorChannel chan MotorDirection, floorChannel chan int) {
+	floor := Core_ReadFloorSensorController(floorChannel)
 	if floor == 0 {
 		state = UP
 		return
@@ -120,20 +126,21 @@ func down(motorChannel chan MotorDirection, floorChannel chan int) {
 }
 
 /*-----------------------------------------------------
-Function:	floorup
+Function:	floorUp
 Affects:	Motor, hall/cab lights and floor
-Operation:	Moves the elevator to a floor above
+Operation:
+		Moves the elevator to a floor above
 		Turns on the cab/hall lights
 		Sets the motordirection to stop when the destination is reached
 		Sees if the target floor was a floor up
 -----------------------------------------------------*/
 
-func floorUp(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int) {
+func core_floorUp(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int) {
 	var floorPoll int
 	for {
-		floorPoll = ReadFloorSensor(floorChannel)
+		floorPoll = Core_ReadFloorSensorController(floorChannel)
 		if floorPoll != UNDEFINED_TARGET_FLOOR {
-			UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
+			Core_UpdateFloorIndicatorController(floorPoll, LastFloor, lightChannel)
 			if floorPoll == TargetFloor {
 				motorChannel <- DIR_STOP
 				lightChannel <- Light{
@@ -150,20 +157,21 @@ func floorUp(motorChannel chan MotorDirection, lightChannel chan Light, floorCha
 	state = IDLE
 }
 
-/*-----------------------------------------------------
-Function:	floordown
+/*------------------------------------------------------------------------------
+Function:	floorDown
 Affects:	Motor, hall/cab lights and floor
-Operation:	Moves the elevator to a floor below
+Operation:
+		Moves the elevator to a floor below
 		Turns on the cab/hall lights when the destiniation is reached
 		Sets the motordirection to stop when the destination is reached
------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 
-func floorDown(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int) {
+func core_floorDown(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int) {
 	var floorPoll int
 	for {
-		floorPoll = ReadFloorSensor(floorChannel)
+		floorPoll = Core_ReadFloorSensorController(floorChannel)
 		if floorPoll != UNDEFINED_TARGET_FLOOR {
-			UpdateFloorIndicator(floorPoll, LastFloor, lightChannel)
+			Core_UpdateFloorIndicatorController(floorPoll, LastFloor, lightChannel)
 			if floorPoll == TargetFloor {
 				motorChannel <- DIR_STOP
 				lightChannel <- Light{
@@ -180,29 +188,30 @@ func floorDown(motorChannel chan MotorDirection, lightChannel chan Light, floorC
 	state = IDLE
 }
 
-/*-----------------------------------------------------
+/*------------------------------------------------------------------------------
 Function:	FiniteStateMachine
 Affects:	state, Motor, hall/cab lights, door lights and requests from server
-Operation:	Sees what state the elevator is in and runs the correct action accordingly
------------------------------------------------------*/
-func FiniteStateMachine(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int, doorChannel chan bool, requestChannel chan Action) {
+Operation:
+Sees what state the elevator is in and runs the correct action accordingly
+------------------------------------------------------------------------------*/
+func Core_FiniteStateMachine(motorChannel chan MotorDirection, lightChannel chan Light, floorChannel chan int, doorChannel chan bool, requestChannel chan Action) {
 	for {
 		if !isInitialized {
 			state = INIT
 		}
 		switch state {
 		case INIT:
-			initState(motorChannel, floorChannel, requestChannel)
+			core_initState(motorChannel, floorChannel, requestChannel)
 		case IDLE:
-			idle(motorChannel, lightChannel, doorChannel, requestChannel)
+			core_idle(motorChannel, lightChannel, doorChannel, requestChannel)
 		case UP:
-			up(motorChannel, floorChannel)
+			core_up(motorChannel, floorChannel)
 		case FLOOR_UP:
-			floorUp(motorChannel, lightChannel, floorChannel)
+			core_floorUp(motorChannel, lightChannel, floorChannel)
 		case DOWN:
-			down(motorChannel, floorChannel)
+			core_down(motorChannel, floorChannel)
 		case FLOOR_DOWN:
-			floorDown(motorChannel, lightChannel, floorChannel)
+			core_floorDown(motorChannel, lightChannel, floorChannel)
 		}
 	}
 }

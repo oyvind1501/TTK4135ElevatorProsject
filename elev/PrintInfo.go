@@ -62,6 +62,11 @@ func printCommunicationTable() {
 	fmt.Println("--------------------------------------------------------")
 }
 
+/*------------------------------------------------------------------------------
+Function:		PrintStateInfo
+Operation:
+Prints the targetfloor, lastfloor and the direction of the current node
+------------------------------------------------------------------------------*/
 func printStateInfo() {
 	fmt.Println("-----------------Elevator Info--------------------------")
 	fmt.Println("	Target floor:\t\t" + strconv.Itoa(TargetFloor))

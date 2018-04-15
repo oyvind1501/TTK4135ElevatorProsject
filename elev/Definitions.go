@@ -114,6 +114,9 @@ var HallOrderTable []HallOrderElement
 var CabOrderTable []CabOrderElement
 var ReserveTable []ReserveElement
 
+var nowFloor int
+var elevDir MotorDirection
+
 var isInitialized bool = false
 var isOrderServed bool = false
 var state int
@@ -135,22 +138,6 @@ var lastHallTarget int = UNDEFINED
 var LastFloor int
 var TargetFloor int
 
-// IsIntermediateStop kan tas ut av systemet
+// IsIntermediateStop kan tas ut av systemet?
 var IsIntermediateStop bool
-
 var ElevatorDirection MotorDirection
-
-// Skal dette være i definitions?
-func ReadFloorSensor(floorChannel chan int) int {
-	select {
-	case floor := <-floorChannel:
-		return floor
-	default:
-		return INVALID_FLOOR
-	}
-}
-
-func UpdateFloorIndicator(floorNumber int, prevFloorNumber int, lightChannel chan Light) {
-	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: false, FloorNumber: prevFloorNumber}
-	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: true, FloorNumber: floorNumber}
-}
