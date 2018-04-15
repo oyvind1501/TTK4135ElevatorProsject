@@ -400,20 +400,4 @@ func Core_RemoveCabOrder(floor int) {
 	}
 }
 
-/*
-func UpdateReservationTable(sendChannel chan ElevatorOrderMessage) {
-	if len(CabOrderTable) != 0 {
-		for _, cabOrder := range CabOrderTable {
-			ReserveTable = append(ReserveTable, ReserveElement{Floor: cabOrder.Floor})
-			removeCabOrder(cabOrder)
-		}
-	}
-	sendChannel <- ElevatorOrderMessage{
-		Event:     EVENT_ORDER_RESERVE_SPECIFIC,
-		Direction: ElevatorDirection,
-		Floor:     LastFloor,
-		Origin:    nodeId,
-		Sender:    nodeId,
-	}
-}
-*/
+
