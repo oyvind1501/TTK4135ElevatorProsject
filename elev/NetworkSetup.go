@@ -223,7 +223,7 @@ func net_sendClientInfo(messageChannel chan NetClient) {
 }
 
 /*------------------------------------------------------------------------------
-Function:		FreeLockedOrders
+Function:		FreeOCCUPIEDOrders
 Operation:
 Sets the status of orders, that has been occupied for a long time,
 to STATUS_AVAILABLE. This do free potentially locked/non-served orders, if any
@@ -249,7 +249,7 @@ func Net_FreeOCCUPIEDOrders() {
 }
 
 /*------------------------------------------------------------------------------
-Function:	IdCommunication
+Function:	ClientInfoCommunication
 Affects:
 Operation:	Broadcasts client information, master, backup,
 and ids to all nodes in the clientNetwork
