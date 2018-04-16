@@ -138,6 +138,5 @@ var lastHallTarget int = UNDEFINED
 var LastFloor int
 var TargetFloor int
 
-// IsIntermediateStop kan tas ut av systemet?
 var IsIntermediateStop bool
 var ElevatorDirection MotorDirection
