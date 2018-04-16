@@ -173,6 +173,18 @@ func Core_DoorController(doorChannel chan bool) {
 }
 
 /*-----------------------------------------------------
+Function:	FiniteStateMachineControllers
+Operation:	Collects all controllers in one function
+-----------------------------------------------------*/
+func Core_FiniteStateMachineControllers(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage, motorChannel chan MotorDirection) {
+	go Core_ActionButtonController(buttonChannel, lightChannel, doorChannel, sendChannel)
+	go Core_ActionRequestController(buttonChannel, lightChannel, doorChannel, requestActionChannel, sendChannel)
+	go Core_MotorController(motorChannel)
+	go Core_LightController(lightChannel)
+	go Core_DoorController(doorChannel)
+}
+
+/*-----------------------------------------------------
 Function:	OpenDoorAction
 Affects:	doorlight
 Operation:	Turns on the doorlight for 2 seconds
@@ -195,12 +207,4 @@ func Core_ReadFloorSensorController(floorChannel chan int) int {
 func Core_UpdateFloorIndicatorController(floorNumber int, prevFloorNumber int, lightChannel chan Light) {
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: false, FloorNumber: prevFloorNumber}
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: true, FloorNumber: floorNumber}
-}
-
-func Core_FiniteStateMachineController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage, motorChannel chan MotorDirection) {
-	go Core_ActionButtonController(buttonChannel, lightChannel, doorChannel, sendChannel)
-	go Core_ActionRequestController(buttonChannel, lightChannel, doorChannel, requestActionChannel, sendChannel)
-	go Core_MotorController(motorChannel)
-	go Core_LightController(lightChannel)
-	go Core_DoorController(doorChannel)
 }

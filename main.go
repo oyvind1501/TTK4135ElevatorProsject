@@ -32,16 +32,7 @@ func main() {
 	receiveOrderChannel := make(chan elev.ElevatorOrderMessage)
 
 	go elev.Core_FiniteStateMachine(motorChannel, lightChannel, floorChannel, doorChannel, requestChannel)
-
-	// Make this to just one file
-	/*
-		go elev.Core_ActionButtonController(buttonChannel, lightChannel, doorChannel, sendOrderChannel)
-		go elev.Core_ActionRequestController(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel)
-		go elev.Core_MotorController(motorChannel)
-		go elev.Core_LightController(lightChannel)
-		go elev.Core_DoorController(doorChannel)
-	*/
-	go elev.Core_FiniteStateMachineController(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel, motorChannel)
+	go elev.Core_FiniteStateMachineControllers(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel, motorChannel)
 
 	go elevio.Net_PollFloorSensor(floorChannel)
 	go elevio.Net_PollButtons(buttonChannel)
