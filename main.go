@@ -30,10 +30,11 @@ func main() {
 	requestChannel := make(chan elev.Action)
 	sendOrderChannel := make(chan elev.ElevatorOrderMessage)
 	receiveOrderChannel := make(chan elev.ElevatorOrderMessage)
+	
+	go elev.Core_FiniteStateMachine(motorChannel, lightChannel, floorChannel, doorChannel, requestChannel)
 
 	go elev.Core_ActionButtonController(buttonChannel, lightChannel, doorChannel, sendOrderChannel)
 	go elev.Core_ActionRequestController(buttonChannel, lightChannel, doorChannel, requestChannel, sendOrderChannel)
-	go elev.Core_FiniteStateMachine(motorChannel, lightChannel, floorChannel, doorChannel, requestChannel)
 	go elev.Core_MotorController(motorChannel)
 	go elev.Core_LightController(lightChannel)
 	go elev.Core_DoorController(doorChannel)
