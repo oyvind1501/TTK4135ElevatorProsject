@@ -187,8 +187,6 @@ func Net_AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light
 
 /*------------------------------------------------------------------------------
 Function:	ClientOrderCommunication
-Affects:	chan ElevatorOrderMessage, chan ElevatorOrderMessage,
-					chan Light, chan bool
 Operation:
 Selects an appropriate response, based upon the event specified in the message.
 ------------------------------------------------------------------------------*/
