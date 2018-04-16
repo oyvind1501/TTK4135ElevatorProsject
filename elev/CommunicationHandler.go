@@ -186,7 +186,7 @@ func Net_AckOrderDoneEvent(message ElevatorOrderMessage, lightChannel chan Light
 }
 
 /*------------------------------------------------------------------------------
-Function:	OrderCommunication
+Function:	ClientOrderCommunication
 Affects:	chan ElevatorOrderMessage, chan ElevatorOrderMessage,
 					chan Light, chan bool
 Operation:
@@ -224,7 +224,7 @@ func Net_ClientOrderCommunication(sendOrderChannel chan ElevatorOrderMessage, re
 }
 
 /*-----------------------------------------------------
-Function:	SetBestParticipantFloor
+Function:	setBestParticipantFloor
 Affects:	Halltable
 Operation:	Finds the best suited client in the client network
 			for an incoming hallorder
