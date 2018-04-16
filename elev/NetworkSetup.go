@@ -281,4 +281,5 @@ func Net_ClientInfoCommunication() {
 			Net_AddClientInfo(message)
 		}
 	}
+
 }

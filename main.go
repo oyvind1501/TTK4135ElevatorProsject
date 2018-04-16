@@ -45,7 +45,7 @@ func main() {
 
 	go elevio.Net_PollFloorSensor(floorChannel)
 	go elevio.Net_PollButtons(buttonChannel)
-	//go elev.Net_FreeOCCUPIEDOrders()
+	go elev.Net_FreeOCCUPIEDOrders()
 	go elev.Net_ClientInfoCommunication()
 	go elev.Net_ClientOrderCommunication(sendOrderChannel, receiveOrderChannel, lightChannel, doorChannel)
 
