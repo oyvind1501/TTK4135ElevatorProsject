@@ -54,7 +54,8 @@ func Core_LightController(lightChannel chan Light) {
 
 /*-----------------------------------------------------
 Function:	ActionButtonController
-Operation:
+Operation:	Controls the hall/cab buttons order 
+		from the nodes to the master
 -----------------------------------------------------*/
 
 func Core_ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, sendChannel chan ElevatorOrderMessage) {
@@ -96,7 +97,7 @@ func Core_ActionButtonController(buttonChannel chan elevio.ButtonEvent, lightCha
 
 /*-----------------------------------------------------
 Function:	ActionRequestController
-Operation:
+Operation:	Controls the flow of requests from the nodes to the master
 -----------------------------------------------------*/
 func Core_ActionRequestController(buttonChannel chan elevio.ButtonEvent, lightChannel chan Light, doorChannel chan bool, requestActionChannel chan Action, sendChannel chan ElevatorOrderMessage) {
 	for {
@@ -191,11 +192,6 @@ func Core_ReadFloorSensorController(floorChannel chan int) int {
 	}
 }
 
-/*-----------------------------------------------------
-Function:	OpenDoorAction
-Affects:
-Operation:	Robin
------------------------------------------------------*/
 
 func Core_UpdateFloorIndicatorController(floorNumber int, prevFloorNumber int, lightChannel chan Light) {
 	lightChannel <- Light{LightType: FLOOR_INDICATOR, LightOn: false, FloorNumber: prevFloorNumber}
