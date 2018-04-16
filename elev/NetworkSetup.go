@@ -29,7 +29,7 @@ func net_generateElevatorID() string {
 
 /*------------------------------------------------------------------------------
 Function:		extractIdentifier
-Operation:	Splits the IP-adress string into its last 4 digits.
+Operation:	Splits the IP-adress string into its last 4+ digits.
 ------------------------------------------------------------------------------*/
 
 func net_extractIdentifier(nodeElement NetworkNode) string {
@@ -100,8 +100,8 @@ func net_removeNode(peerUpdateMessage peers.PeerUpdate) {
 /*------------------------------------------------------------------------------
 Function:	setMasterId
 Affects:	ClientTable
-Operation:	Makes the client/node with the smallest 4 digits in the
-IP-information become the master
+Operation:	Makes the client/node with the smallest 4+ digits in the
+IP-information the master
 ------------------------------------------------------------------------------*/
 
 func net_setMasterId(peerUpdateMessage peers.PeerUpdate) {
@@ -133,8 +133,8 @@ func net_setMasterId(peerUpdateMessage peers.PeerUpdate) {
 Function:	setBackupId
 Affects:	ClientTable
 Operation:
-Makes the client/node with the nextsmallest 4 digits in the
-IP-information become the backup
+Makes the client/node with the nextsmallest 4+ digits in the
+IP-information the backup
 ------------------------------------------------------------------------------*/
 func net_setBackupId(peerUpdateMessage peers.PeerUpdate) {
 	if len(ClientTable) == 0 {
@@ -225,7 +225,7 @@ func net_sendClientInfo(messageChannel chan NetClient) {
 /*------------------------------------------------------------------------------
 Function:		FreeOCCUPIEDOrders
 Operation:
-Sets the status of orders, that has been occupied for a long time,
+Sets the status of orders, that has been occupied for a given threshold time,
 to STATUS_AVAILABLE. This do free potentially locked/non-served orders, if any
 issues should arise.
 ------------------------------------------------------------------------------*/
@@ -250,7 +250,6 @@ func Net_FreeOCCUPIEDOrders() {
 
 /*------------------------------------------------------------------------------
 Function:	ClientInfoCommunication
-Affects:
 Operation:	Broadcasts client information, master, backup,
 and ids to all nodes in the clientNetwork
 ------------------------------------------------------------------------------*/
